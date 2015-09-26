@@ -1,0 +1,5 @@
+"user_friend_cache"		--用户好友关系表
+"user_data_cache"		-- 用户详细资料表
+"forum_data_cache"		-- 论坛用户对白表
+"user_forum_data_cache"	-- 用户对应对白id数组
+"path_forum_data_cache"	-- 所在世界位置对应对白id数组

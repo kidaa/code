@@ -1,0 +1,19 @@
+1.tb_friend 和tb_friend_request 建立所以
+
+// 执行alter table tb_friend add UNIQUE (account_num,friend_id) 建立UNIQUE类型的索引，避免插入重复数据，
+// 也可在Navicat视图下，右键设计表->切换到索引栏->右键添加索引，建立成功记得保持
+
+
+// 执行alter table tb_friend_request add UNIQUE (incept_account,req_account) 建立UNIQUE类型的索引，避免插入重复数据，
+// 也可在Navicat视图下，右键设计表->切换到索引栏->右键添加索引，建立成功记得保持
+
+2.tb_user_bag 表articles_id字段改为int（10）默认值0，加索引account_num,articles_id
+
+
+
+3.tb_dialog_stat表，加唯一索引adialog_id,abs_path
+
+4.tb_user_topstick 表，加唯一索引 account_num, dialog_id, abs_path, dialog_type
+
+
+5.tb_user_passwd 和tb_user_member 增加 qq_uid
