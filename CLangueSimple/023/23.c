@@ -4,7 +4,7 @@ main()
 {
 	int j,   /*游标变量*/
 	      *p; /*指针变量*/
-	clrscr();
+
 	for(j=0;j<N;j++)/*数组名和下标顺序访问数组的元素*/
 		printf("a[%d]\t= %d\t",j,a[j]);
 	printf("\n");

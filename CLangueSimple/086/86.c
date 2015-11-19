@@ -2,7 +2,6 @@
 void main()
 {
     int i=1;                  /*i为所设的阶梯数*/
-    clrscr();
     puts("**************************************************");
     puts("*        This program is to solve                *");
     puts("*     Einstein's interesting math question,      *");
