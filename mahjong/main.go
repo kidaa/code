@@ -74,10 +74,10 @@ func (this *Cards) Out(seat int, card int) {
 }
 func (this *Cards) Get() int {
 	card := 0
-	if len(this.TableCards) > 0 {
-		card = this.TableCards[len(this.TableCards)-1]
-		this.TableCards = this.TableCards[0 : len(this.TableCards)-1]
-
+	l := len(this.TableCards)
+	if l > 0 {
+		card = this.TableCards[l-1]
+		this.TableCards = this.TableCards[0 : l-1]
 	}
 	return card
 }
@@ -88,11 +88,12 @@ func (this *Cards) LeftCount() int {
 func (this *Cards) draw() []int {
 	t := time.Now()
 	rand.Seed(t.UnixNano())
-	for i := range CARDS {
-		j := rand.Intn(i + 1)
-		CARDS[i], CARDS[j] = CARDS[j], CARDS[i]
-	}
 	d := make([]int, TOTAL, TOTAL)
 	copy(d, CARDS)
+
+	for i := range d {
+		j := rand.Intn(i + 1)
+		d[i], d[j] = d[j], d[i]
+	}
 	return d
 }
