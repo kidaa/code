@@ -42,7 +42,19 @@ type Cards struct {
 	Remainder3 []byte
 	Remainder4 []byte
 }
+type sortByte []byte
 
+func (s sortByte) Less(i, j int) bool {
+	return s[i] < s[j]
+}
+
+func (s sortByte) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s sortByte) Len() int {
+	return len(s)
+}
 func main() {
 	cards := &Cards{}
 	cards.Deal()
@@ -53,7 +65,7 @@ func main() {
 	//fmt.Println(cards.Hand4, len(cards.Hand4))
 	//fmt.Println(cards.Get())
 	//a := []byte{11, 11, 11, 12, 12, 13, 14, 15, 16, 17, 18, 19, 19, 19}
-	a := []byte{0x11, 0x11, 0x11, 0x12, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x19, 0x19}
+	a := []byte{0x21, 0x21, 0x21, 0x12, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x19, 0x19}
 	fmt.Println(cards.hu(a))
 }
 func (this *Cards) Deal() {
@@ -64,14 +76,14 @@ func (this *Cards) Deal() {
 	this.Hand1 = this.TableCards[HAND*3 : HAND*4+1]
 	this.TableCards = this.TableCards[HAND*4+1 : TOTAL]
 }
-func (this *Cards) hu(list []byte) bool {
-	sort.Sort(list)
-	le := len(list)
-	fmt.Println(list)
+func (this *Cards) hu(original []byte) bool {
+	sort.Sort(sortByte(original))
+	le := len(original)
+	fmt.Println(original)
 	for n := 0; n < le-1; n++ {
-		var jiang byte = 0x00
-		if list[n] == list[n+1] {
-			jiang = list[n]
+		if original[n] == original[n+1] {
+			list := make([]byte, le, le)
+			copy(list, original)
 			list[n] = 0x00
 			list[n+1] = 0x00
 			for i := 0; i < le; i++ {
@@ -85,17 +97,15 @@ func (this *Cards) hu(list []byte) bool {
 					}
 				}
 			}
-			num := 0
+			num := false
 			for i := 0; i < le; i++ {
 				if list[i] > 0 {
-					num = 1
+					num = true
 				}
 			}
-			if num == 0 {
+			if !num {
 				return true
 			}
-			list[n] = jiang
-			list[n+1] = jiang
 		}
 	}
 	return false
@@ -132,7 +142,7 @@ func (this *Cards) LeftCount() int {
 func (this *Cards) draw() []byte {
 	t := time.Now()
 	rand.Seed(t.UnixNano())
-	d := make([]byte, 0, TOTAL)
+	d := make([]byte, TOTAL, TOTAL)
 	copy(d, CARDS)
 
 	for i := range d {
