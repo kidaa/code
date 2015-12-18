@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"sort"
 	"time"
 )
 
@@ -36,12 +37,14 @@ func init() {
 func main() {
 	cards := &Cards{}
 	cards.Deal()
-	fmt.Println(cards.TableCards, len(cards.TableCards))
-	fmt.Println(cards.Hand1, len(cards.Hand1))
-	fmt.Println(cards.Hand2, len(cards.Hand2))
-	fmt.Println(cards.Hand3, len(cards.Hand3))
-	fmt.Println(cards.Hand4, len(cards.Hand4))
-	fmt.Println(cards.Get())
+	//fmt.Println(cards.TableCards, len(cards.TableCards))
+	//fmt.Println(cards.Hand1, len(cards.Hand1))
+	//fmt.Println(cards.Hand2, len(cards.Hand2))
+	//fmt.Println(cards.Hand3, len(cards.Hand3))
+	//fmt.Println(cards.Hand4, len(cards.Hand4))
+	//fmt.Println(cards.Get())
+	a := []int{11, 11, 11, 12, 12, 13, 14, 15, 16, 17, 18, 19, 19, 19}
+	fmt.Println(cards.hu(a))
 }
 func (this *Cards) Deal() {
 	this.TableCards = this.draw()
@@ -52,9 +55,41 @@ func (this *Cards) Deal() {
 	this.TableCards = this.TableCards[HAND*4+1 : TOTAL]
 }
 func (this *Cards) hu(list []int) bool {
-	boo := false
+	sort.Ints(list)
+	le := len(list)
+	fmt.Println(list)
+	for n := 0; n < le-1; n++ {
+		jiang := 0
+		if list[n] == list[n+1] {
+			jiang = list[n]
+			list[n] = 0
+			list[n+1] = 0
+			for i := 0; i < le; i++ {
+				for j := i + 1; j < le; j++ {
+					for k := j + 1; k < le; k++ {
+						if ((list[i]+1) == list[j] && (list[j]+1) == list[k]) || (list[i] > 0 && list[i] == list[j] && list[j] == list[k]) {
+							list[i] = 0
+							list[j] = 0
+							list[k] = 0
+						}
+					}
+				}
+			}
+			num := 0
+			for i := 0; i < le; i++ {
+				if list[i] > 0 {
+					num = list[i]
+				}
+			}
+			if num == 0 {
+				return true
+			}
+			list[n] = jiang
+			list[n+1] = jiang
+		}
 
-	return boo
+	}
+	return false
 }
 func (this *Cards) Out(seat int, card int) {
 	if seat == 1 {
@@ -88,7 +123,7 @@ func (this *Cards) LeftCount() int {
 func (this *Cards) draw() []int {
 	t := time.Now()
 	rand.Seed(t.UnixNano())
-	d := make([]int, TOTAL, TOTAL)
+	d := make([]int, 0, TOTAL)
 	copy(d, CARDS)
 
 	for i := range d {
