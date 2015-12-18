@@ -9,31 +9,40 @@ import (
 
 const (
 	TOTAL = 108
-	WAN   = 3
-	TONG  = 2
-	TIAO  = 1
+	WAN   = 2
+	TONG  = 1
+	TIAO  = 0
 	HAND  = 13
 	SEAT  = 4
 )
 
-var CARDS = []int{11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39}
+var CARDS = []byte{
+	0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+	0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+	0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+	0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+	0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
+	0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
+	0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
+	0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
+	0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29,
+	0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29,
+	0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29,
+	0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29,
+}
 
 type Cards struct {
-	TableCards []int
-	Hand1      []int
-	Hand2      []int
-	Hand3      []int
-	Hand4      []int
-	Remainder1 []int
-	Remainder2 []int
-	Remainder3 []int
-	Remainder4 []int
+	TableCards []byte
+	Hand1      []byte
+	Hand2      []byte
+	Hand3      []byte
+	Hand4      []byte
+	Remainder1 []byte
+	Remainder2 []byte
+	Remainder3 []byte
+	Remainder4 []byte
 }
 
-func init() {
-	CARDS = append(CARDS, CARDS...)
-	CARDS = append(CARDS, CARDS...)
-}
 func main() {
 	cards := &Cards{}
 	cards.Deal()
@@ -43,7 +52,8 @@ func main() {
 	//fmt.Println(cards.Hand3, len(cards.Hand3))
 	//fmt.Println(cards.Hand4, len(cards.Hand4))
 	//fmt.Println(cards.Get())
-	a := []int{11, 11, 11, 12, 12, 13, 14, 15, 16, 17, 18, 19, 19, 19}
+	//a := []byte{11, 11, 11, 12, 12, 13, 14, 15, 16, 17, 18, 19, 19, 19}
+	a := []byte{0x11, 0x11, 0x11, 0x12, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x19, 0x19}
 	fmt.Println(cards.hu(a))
 }
 func (this *Cards) Deal() {
@@ -54,23 +64,23 @@ func (this *Cards) Deal() {
 	this.Hand1 = this.TableCards[HAND*3 : HAND*4+1]
 	this.TableCards = this.TableCards[HAND*4+1 : TOTAL]
 }
-func (this *Cards) hu(list []int) bool {
-	sort.Ints(list)
+func (this *Cards) hu(list []byte) bool {
+	sort.Sort(list)
 	le := len(list)
 	fmt.Println(list)
 	for n := 0; n < le-1; n++ {
-		jiang := 0
+		var jiang byte = 0x00
 		if list[n] == list[n+1] {
 			jiang = list[n]
-			list[n] = 0
-			list[n+1] = 0
+			list[n] = 0x00
+			list[n+1] = 0x00
 			for i := 0; i < le; i++ {
 				for j := i + 1; j < le; j++ {
 					for k := j + 1; k < le; k++ {
-						if ((list[i]+1) == list[j] && (list[j]+1) == list[k]) || (list[i] > 0 && list[i] == list[j] && list[j] == list[k]) {
-							list[i] = 0
-							list[j] = 0
-							list[k] = 0
+						if list[i] > 0 && ((list[i]+1) == list[j] && (list[j]+1) == list[k]) || (list[i] == list[j] && list[j] == list[k]) {
+							list[i] = 0x00
+							list[j] = 0x00
+							list[k] = 0x00
 						}
 					}
 				}
@@ -78,7 +88,7 @@ func (this *Cards) hu(list []int) bool {
 			num := 0
 			for i := 0; i < le; i++ {
 				if list[i] > 0 {
-					num = list[i]
+					num = 1
 				}
 			}
 			if num == 0 {
@@ -87,11 +97,10 @@ func (this *Cards) hu(list []int) bool {
 			list[n] = jiang
 			list[n+1] = jiang
 		}
-
 	}
 	return false
 }
-func (this *Cards) Out(seat int, card int) {
+func (this *Cards) Out(seat int, card byte) {
 	if seat == 1 {
 		this.Remainder1 = append(this.Remainder1, card)
 	} else if seat == 2 {
@@ -107,8 +116,8 @@ func (this *Cards) Out(seat int, card int) {
 
 	}
 }
-func (this *Cards) Get() int {
-	card := 0
+func (this *Cards) Get() byte {
+	var card byte = 0
 	l := len(this.TableCards)
 	if l > 0 {
 		card = this.TableCards[l-1]
@@ -120,10 +129,10 @@ func (this *Cards) Get() int {
 func (this *Cards) LeftCount() int {
 	return len(this.TableCards)
 }
-func (this *Cards) draw() []int {
+func (this *Cards) draw() []byte {
 	t := time.Now()
 	rand.Seed(t.UnixNano())
-	d := make([]int, 0, TOTAL)
+	d := make([]byte, 0, TOTAL)
 	copy(d, CARDS)
 
 	for i := range d {
