@@ -58,15 +58,12 @@ func (s sortByte) Len() int {
 func main() {
 	cards := &Cards{}
 	cards.Deal()
-	//fmt.Println(cards.TableCards, len(cards.TableCards))
-	//fmt.Println(cards.Hand1, len(cards.Hand1))
-	//fmt.Println(cards.Hand2, len(cards.Hand2))
-	//fmt.Println(cards.Hand3, len(cards.Hand3))
-	//fmt.Println(cards.Hand4, len(cards.Hand4))
 	//fmt.Println(cards.Get())
-	//a := []byte{11, 11, 11, 12, 12, 13, 14, 15, 16, 17, 18, 19, 19, 19}
-	a := []byte{0x21, 0x21, 0x21, 0x12, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x19, 0x19}
-	fmt.Println(cards.hu(a))
+	a := []byte{0x21, 0x21, 0x12, 0x13, 0x13, 0x14, 0x14, 0x16, 0x16, 0x18, 0x18, 0x19, 0x19}
+	//a := []byte{0x21, 0x21, 0x21, 0x12, 0x12, 0x12, 0x14, 0x14, 0x14, 0x17, 0x17, 0x17, 0x19, 0x19}
+	//a := []byte{0x21, 0x21, 0x22, 0x22, 0x23, 0x23, 0x14, 0x14, 0x15, 0x15, 0x16, 0x16, 0x17, 0x17}
+	fmt.Println(cards.ting(a))
+	fmt.Println(cards.Patterns(0x21))
 }
 func (this *Cards) Deal() {
 	this.TableCards = this.draw()
@@ -76,10 +73,66 @@ func (this *Cards) Deal() {
 	this.Hand1 = this.TableCards[HAND*3 : HAND*4+1]
 	this.TableCards = this.TableCards[HAND*4+1 : TOTAL]
 }
+func (this *Cards) Patterns(card byte) int {
+	return int(card >> 4)
+}
+
+func (this *Cards) ting(original []byte) bool {
+	sort.Sort(sortByte(original))
+	le := len(original)
+	for n := 0; n < le-1; n++ {
+		if original[n] == original[n+1] {
+			list := make([]byte, le, le)
+			copy(list, original)
+			list[n] = 0x00
+			list[n+1] = 0x00
+			for i := 0; i < le; i++ {
+				for j := i + 1; j < le; j++ {
+					for k := j + 1; k < le; k++ {
+						if list[i] > 0 && ((list[i]+1) == list[j] && (list[j]+1) == list[k]) || (list[i] == list[j] && list[j] == list[k]) {
+							list[i] = 0x00
+							list[j] = 0x00
+							list[k] = 0x00
+						}
+					}
+				}
+			}
+			arr := make([]byte, 0, le)
+			for i := 0; i < le; i++ {
+				if list[i] > 0 {
+					arr = append(arr, list[i])
+				}
+			}
+			if len(arr) == 1 {
+				return true
+			} else if len(arr) == 2 && (arr[0]+1 == arr[1] || arr[0] == arr[1]) {
+				return true
+			}
+		}
+	}
+
+	list := make([]byte, le, le)
+	copy(list, original)
+	for n := 0; n < le-1; n++ {
+		if original[n] == original[n+1] {
+			list[n] = 0x00
+			list[n+1] = 0x00
+		}
+	}
+	count := 0
+	for i := 0; i < le; i++ {
+		if list[i] > 0 {
+			count = count + 1
+		}
+	}
+	if count == 1 {
+		return true
+	}
+	return false
+}
 func (this *Cards) hu(original []byte) bool {
 	sort.Sort(sortByte(original))
 	le := len(original)
-	fmt.Println(original)
 	for n := 0; n < le-1; n++ {
 		if original[n] == original[n+1] {
 			list := make([]byte, le, le)
@@ -101,6 +154,7 @@ func (this *Cards) hu(original []byte) bool {
 			for i := 0; i < le; i++ {
 				if list[i] > 0 {
 					num = true
+					break
 				}
 			}
 			if !num {
@@ -108,6 +162,25 @@ func (this *Cards) hu(original []byte) bool {
 			}
 		}
 	}
+	list := make([]byte, le, le)
+	copy(list, original)
+	for n := 0; n < le-1; n++ {
+		if original[n] == original[n+1] {
+			list[n] = 0x00
+			list[n+1] = 0x00
+		}
+	}
+	num := false
+	for i := 0; i < le; i++ {
+		if list[i] > 0 {
+			num = true
+			break
+		}
+	}
+	if !num {
+		return true
+	}
+
 	return false
 }
 func (this *Cards) Out(seat int, card byte) {
